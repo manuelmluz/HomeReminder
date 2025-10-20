@@ -1,0 +1,24 @@
+{% extends "main/layout.html" %}
+
+{% block body %}
+    
+    <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
+
+    <div name = "new_reminder">
+     <a> this is the user page</a>
+    </div>
+
+
+    <div name = "user_reminders">
+        <ul>
+            {% for reminder in reminders%}
+            <div name = "individual_reminder">
+                <li> Reminder: {{reminder}}  </li>
+                <a> Reminder description: {{reminder.reminder_description}}
+            </div>
+            {% endfor %}
+        </ul>
+        
+    </div>
+
+{% endblock %}

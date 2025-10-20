@@ -2,21 +2,23 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-# from django.db import models
+# for single user create model instance methods
+# for set-based queries use a custom query set/ manager
 
 # Create your models here.
 #does this class already have string representation??
 class User(AbstractUser):
     # abstract user already has name password username type shit
     # can still add more if needed
-
+    
     #listings field??
+    
     pass
 
 class Reminder(models.Model):
 
     # link the user_id with his reminders, when calling Reminders now you can access all of the User table Reminder.creator_id.user_id
-    creator_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name= "creator")
+    creator_username = models.ForeignKey(User, on_delete=models.CASCADE, related_name= "reminders")
  
     reminder_name = models.CharField(max_length=100)
     reminder_description = models.TextField(max_length= 500, blank=True)

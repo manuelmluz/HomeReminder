@@ -1,9 +1,10 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect,HttpResponseForbidden
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse
 from.models import Reminder
+from .forms import Add_Reminder_Form
 #from .forms import listing_form 
 
 from .models import User
@@ -73,11 +74,11 @@ def logout_view(request):
     logout(request)
     return HttpResponseRedirect(reverse("login"))
 
-def user_view(request, username):
-    # we might need to authenticate it like in login_view
-    
-    #print(username)
 
+# pretty sure i can clean up half of this
+def user_view(request, username):
+    # we might need to authenticate it like in login_view 
+    #print(username)
     # any user logged in is authenticated i think
     if request.user.is_authenticated: # do we need to authenticate the user again
         #gets the username
@@ -86,10 +87,27 @@ def user_view(request, username):
         reminders = user.reminders.all().order_by("reminder_start_date")  
         print(user)
         print(reminders)
+        # FORM
+        if request.method=="POST":
+            form = Add_Reminder_Form(request.POST,request.FILES)
+            if form.is_valid():
+                #attaching the current user to the form so it saves
+                form = form.save(commit=False)
+                form.creator_username = request.user
+                form.save()
+                
+                #reload page icky
+                return redirect("user", username=user.username)
+
+        else:
+            form = Add_Reminder_Form()
+
+
         # reminders object is now passed down
         return render(request,"main/user_page.html",{
             "user":user,
-            "reminders":reminders
+            "reminders":reminders,
+            "form": Add_Reminder_Form
         })
         
     else:

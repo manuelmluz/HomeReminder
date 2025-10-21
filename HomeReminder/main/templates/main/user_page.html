@@ -1,24 +1,42 @@
 {% extends "main/layout.html" %}
+{%load static%}
 
 {% block body %}
     
     <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
 
-    <div name = "new_reminder">
-     <a> this is the user page</a>
+    <div id = "new_reminder_div">
+        <form id = "new_reminder_form" method = "POST"  enctype="multipart/form-data">
+            {% csrf_token %}
+                {{ form }}
+                <button id = "new_reminder_button" type="submit" class="btn btn-success">Add New Reminder</button>
+                {% if error %}
+                    <p class= "error"> {{error}} </p>
+                {% endif %} 
+        </form>
     </div>
 
-
-    <div name = "user_reminders">
-        <ul>
-            {% for reminder in reminders%}
-            <div name = "individual_reminder">
-                <li> Reminder: {{reminder}}  </li>
-                <a> Reminder description: {{reminder.reminder_description}}
-            </div>
-            {% endfor %}
-        </ul>
-        
+    <div id = "user_reminders_div">
+            <table id="user_reminders_table" class="display">
+        <thead>
+            <tr>
+                <th>Reminder</th>
+                <th>Reminder Description</th>
+                <th>Date started</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+            </table>
     </div>
 
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'jquery.js'%}"></script>
+    <script src="{% static 'user_page.js'%}"> </script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.4/css/dataTables.dataTables.css" />
+    <script src="https://cdn.datatables.net/2.3.4/js/dataTables.js"></script>
+    
+    
 {% endblock %}

@@ -11,8 +11,8 @@ from .models import User, Reminder
 
 @login_required
 def reminders_api(request):
-    print("THIS IS BEING CALLED HEHEHEHEHEHEHEHE")
-    print(request.user)
+    #print("THIS IS BEING CALLED HEHEHEHEHEHEHEHE")
+    #print(request.user)
     # i think this works mayhaps
     reminders = Reminder.objects.filter(creator_username=request.user)
 

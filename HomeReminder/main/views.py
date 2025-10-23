@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect,HttpResponseForbidden
 from django.shortcuts import redirect, render, get_object_or_404
@@ -35,7 +36,7 @@ def login_view(request):
         if user is not None:
             login(request, user)
             #login user and send him to user_page, need to send him the user name
-            return HttpResponseRedirect(reverse("user", args=(username,)))
+            return HttpResponseRedirect(reverse("user"))
         else:
             return render(request, "main/login.html", {
                 "message": "Invalid username and/or password."
@@ -66,7 +67,7 @@ def register(request):
                 "message": "Username already taken."
             })
         login(request, user)
-        return HttpResponseRedirect(reverse("user", args=(username,)))
+        return HttpResponseRedirect(reverse("user"))
     else:
         return render(request, "main/register.html")
     
@@ -75,43 +76,28 @@ def logout_view(request):
     return HttpResponseRedirect(reverse("login"))
 
 
-# pretty sure i can clean up half of this
-def user_view(request, username):
-    # we might need to authenticate it like in login_view 
-    #print(username)
-    # any user logged in is authenticated i think
-    if request.user.is_authenticated: # do we need to authenticate the user again
-        #gets the username
-        user = get_object_or_404(User, username=username)
-        #gets the usernames reminders as a list
-        reminders = user.reminders.all().order_by("reminder_start_date")  
-        print(user)
-        print(reminders)
-        # FORM
-        if request.method=="POST":
-            form = Add_Reminder_Form(request.POST,request.FILES)
-            if form.is_valid():
-                #attaching the current user to the form so it saves
-                form = form.save(commit=False)
-                form.creator_username = request.user
-                form.save()
-                
-                #reload page icky
-                return redirect("user", username=user.username)
 
-        else:
-            form = Add_Reminder_Form()
+@login_required
+def user_view(request):
+    user = request.user
+    reminders = user.reminders.all().order_by("reminder_start_date")
 
-
-        # reminders object is now passed down
-        return render(request,"main/user_page.html",{
-            "user":user,
-            "reminders":reminders,
-            "form": Add_Reminder_Form
-        })
-        
+    if request.method == "POST":
+        form = Add_Reminder_Form(request.POST, request.FILES)
+        if form.is_valid():
+            #could add a try and except here so it can handle error better
+            obj = form.save(commit=False)
+            obj.creator_username = user
+            obj.save()
+            
+            return redirect("user")  # /me/
     else:
-        print("user is NOT authenticated")
-        return HttpResponseRedirect(reverse("login"))
+        form = Add_Reminder_Form()
+
+    return render(request, "main/user_page.html", {
+        "user": user,
+        "reminders": reminders,
+        "form": form,   # pass the *instance*, not the class
+    })
 
     #return render(request, "main/user_page.html")

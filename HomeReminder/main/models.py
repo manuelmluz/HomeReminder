@@ -8,6 +8,7 @@ from django.db import models
 # Create your models here.
 #does this class already have string representation??
 class User(AbstractUser):
+    # this already enforces unique username
     # abstract user already has name password username type shit
     # can still add more if needed
     

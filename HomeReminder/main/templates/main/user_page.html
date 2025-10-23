@@ -5,6 +5,8 @@
     
     <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
 
+
+    
     <div id = "new_reminder_div">
         <form id = "new_reminder_form" method = "POST"  enctype="multipart/form-data">
             {% csrf_token %}
